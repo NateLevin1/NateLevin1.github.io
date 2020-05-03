@@ -27,7 +27,7 @@ body {
 	height:100%;
 }
 h2 {
-	font-size: 6vh;
+	font-size: 5vh;
 	color: var(--accent);
 	font-family: sans-serif;
 	margin-left:2vw;
@@ -38,7 +38,7 @@ h2:hover {
 	background-color: rgba(255,255,255, 0.5);
 }
 ul {
-	font-size: 4vh;
+	font-size: 3vh;
 	color: var(--accent);
 	font-family: sans-serif;
 	margin-left:4vw;
