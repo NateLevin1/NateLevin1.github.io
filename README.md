@@ -1,2 +1,2 @@
-# UltimatePro-Grammer.github.io
-Github Pages for UltimateProGrammer
+# UltimateProGrammer Github Pages
+Github Pages for UltimateProGrammer. Currently hosting b^2 docs.
