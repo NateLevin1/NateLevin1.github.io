@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      background-color: rgb(0, 0, 0);
+    }
+    #editorbg {
+      background-color: rgb(5, 20, 20);
+      height: 110%;
+    }
+
+    .text {
+      color: white;
+      font-family: monospace;
+      margin-top: 2vh;
+      margin-bottom: 2vh;
+      margin-left: 1vw;
+      display: block;
+      font-size: 1em;
+    }
+
+    .pretext {
+      color: white;
+      font-family: monospace;
+      margin-top: 2vh;
+      margin-bottom: 2vh;
+      margin-left: 1vw;
+      width:90%;
+      display: inline-block;
+      transition: all 0.2s;
+        font-size:2.1em;
+      
+    }
+    .pretext:hover {
+      background-color: rgb(10, 25, 25);
+    }
+
+    #check {
+      display: inline-block;
+    }
+    #run {
+      display: inline-block;
+    }
+    #clear-console {
+      display: none;
+    }
+    #save {
+      display: inline-block;
+    }
+    #load {
+      display: inline-block;
+    }
+    #output {
+      width:71vw;
+      height: 40vh;
+      top:17px;
+    }
+    #run-output {
+      width:20vw;
+      height: 40vh;
+      top:17px;
+    }
+    #run-output:not([data-placeholder=""]):empty::before {
+      content: attr(data-placeholder);
+        font-family:sans-serif;
+        font-style:italic;
+        color:darkgray;
+    }
+      .output {
+          vertical-align:top;
+          /*display:none; Off because it is better off */
+          display:inline-block;
+          background-color: rgb(5, 20, 20);
+          border: 2px solid black;
+          padding-top:20px;
+          transition: all 0.2s;
+          overflow: auto;
+          color: white;
+          position: relative;
+      }
+      code { 
+          display: block; /* Because Safari Is Stupid */
+      }
+
+    .output:hover {
+      border: 2px solid rgb(50, 50, 50);
+      background-color: rgb(15, 30, 30);
+    }
+
+    button {
+      background-color: rgb(10, 170, 50);
+      border: 2px solid rgb(5, 20, 20);
+      color: white;
+      padding: 10px 15px;
+      text-align: center;
+      text-decoration: none;
+      font-size: 0.7em;
+      margin: 4px 2px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    button:hover {
+      background-color:red;
+      border: 2px solid white;
+    }
+    button:active {
+      background-color:white;
+      border: 2px solid black;
+      color:black;
+    }
+
+    #sizebg {
+      position: absolute;
+      right: 4vw;
+      height: 150px;
+      width: 16px;
+      background-color: rgba(130, 130, 130,0.5);
+      transition: all 0.2s;
+    }
+    #size-slider {
+      position: absolute;
+      right: 0.03vw;
+      height: 75px;
+      width: 16px;
+      background-color: rgba(200, 80, 80,0.5);
+      transition: all 0.2s;
+    }
+    #size-slider-button {
+      position: relative;
+      top:75px;
+      height: 10px;
+      width: 16px;
+      background-color: rgba(0, 0, 0,1);
+      transition: all 0.2s;
+    }
+      
+      #sizer {
+          writing-mode: bt-lr; /* IE */
+        -webkit-appearance: slider-vertical; /* WebKit */
+        width: 8px;
+        height: 148px;
+        padding: 0 5px;
+          position:absolute;
+          opacity:0;
+      }
+
+    .log {
+      color: white;
+      margin: -10px 10px;
+    }
+    .warn {
+      color: orange;
+      margin: 10px 10px;
+    }
+    .error {
+      color: rgb(255, 50, 50);
+      margin: 10px 10px;
+    }
+      
+
+    #size:hover {
+      opacity: 1;
+    }
+      
+    label {
+        display: inline;
+        color:white;
+        font-family: monospace;
+        font-size: 0.2em;
+    }
+      #wasm-log, #wat-out, .no-show {
+          display:none;
+      }
+      #new-modal-wrapper {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+      }
+      #new-modal {
+          
+          position: fixed;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+      }
+      .new-modal-content {
+          font-family:sans-serif;
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+      }
+      #new-modal-close {
+        position: relative;
+          top:10px;
+          right:-14vw;
+        font-size: 2em;
+          text-align: center;
+      }
+      .header {
+          font-size:3em;
+          font-weight: bold;
+      }
+      .dark-label {
+          color:black;
+          font-family:sans-serif;
+          font-size:0.8em;
+      }
+      .clickable-text {
+          transition: color 0.2s;
+          color: #999999;
+        font-size: 28px;
+        font-weight: bold;
+      }
+      .clickable-text:hover,
+      .clickable-text:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      input[openable] {
+          opacity: 0;
+      }
+      span[openable]::before {
+          content:"";
+          display: inline-block;
+          width: 0; 
+          height: 0; 
+          border-top: 4px solid transparent;
+          border-bottom: 4px solid transparent;
+          border-left: 8px solid white;
+          position:relative;
+          left:-4px;
+          top:1.3px;
+          transition: all 0.2s;
+      }
+      input:checked + span[openable]::before {
+          transform:rotate(90deg);
+      }
+
+  </style>
+
+</head>
+<body>
+  <span id="container"></span>
+  <p class="big-text text">B&sup2; Editor and Compiler</p>
+  <div id="editorbg">
+
+    <div id="sizebg">
+      <div id="size-slider"></div>
+        <div id="size-slider-button"></div>
+        <input type="range" id="sizer" value="2.1" min="0.2" max="4" step="0.1" orient="vertical">
+    </div>
+
+    <p class="text">B&sup2; Code:</p>
+  <pre contenteditable="true" id="editor" class="pretext">
+// Type text here /;
+number x = input ;
+output add 1 x ;
+</pre>
+<br>
+<button id="check">Highlight</button>
+<button id="run">Compile</button>
+<button id="clear-console">Clear Console</button>
+<button id="save">Save</button>
+<button id="load">Load</button>
+      
+      <br>
+<label>
+<input type="checkbox" id="wat-check" openable>
+    <span openable>Wat File Output</span></label>
+      <div id="wat-out">
+<p class="text">.wat Compiled File:</p>
+<pre id="compiled" class="pretext">
+Compile before viewing WAT file!
+</pre>
+      </div>
+<br>
+      <label>
+      <input type="checkbox" id="wasm-log-check" openable>
+      <span openable>Wasm Log Output</span>
+      </label>
+      <div id="wasm-log">
+<p class="text">.wasm Log File:</p>
+<pre id="wasmcompiled" class="pretext" style="font-size:0.5em">
+Compile before viewing WASM log file!
+</pre>
+          </div>
+<br>
+      <label>
+<input id="compatibility" type="checkbox" style="display: inline-block;" checked>
+          <span>Old WAT compatibility</span> (for webassembly.studio)</label> <a href="https://github.com/wasdk/WebAssemblyStudio/issues/434" style="display: inline; font-family: monospace; font-size: 0.2em;">ref</a>
+</div>
+    
+<!-- OUTPUT !-->
+<div id="output" class="output"></div>
+<div id="run-output" class="output" data-placeholder="Click this box to add a custom testcase."></div>
+    
+    
+    <!-- MODAL !-->
+    <div id="new-modal-wrapper">
+        <div id="new-modal">
+            <div class="new-modal-content" id="modal-content">
+                <p class="header">New Testcase</p>
+                <p>Enter a specific value for each parameter. Click the plus to add a new input parameter. When looping, 1 will be added to each value.</p>
+                <div id="param-container">
+                <label class="dark-label" id="param-label-1">Parameter 1:</label>
+                <input type="text" id="param-1" value="1">
+                <br id="param-br-1">
+                    
+                <span id="new-modal-add" class="clickable-text">&#43;</span>
+                    
+                <span id="new-modal-sub" class="clickable-text" style="padding-left:10px;">&#45;</span>
+                    </div>
+                <label class="dark-label" style="font-size:1em">Loop</label>
+                <input type="number" id="loops" value="1" style="width:5em;height:5vh;font-size:1em; display:inline-block;text-align:center;">
+                <label class="dark-label" style="font-size:1em">times.</label>
+                <br>
+                <label class="dark-label" style="font-size:1em; color:red; display:none;" id="loop-warning">Looping more than 10,000 times may freeze the editor for a short period of time when compiling.</label>
+                <br>
+                <span id="new-modal-close" class="clickable-text">Save</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- SETTINGS !-->
+    <div class="no-show">
+      <input type="checkbox" id="exceptions"><label for="exceptions">exceptions</label>
+      <input type="checkbox" id="mutable_globals" checked=""><label for="mutable_globals">mutable globals</label>
+      <input type="checkbox" id="sat_float_to_int"><label for="sat_float_to_int">saturating float to int</label>
+      <input type="checkbox" id="sign_extension"><label for="sign_extension">sign extension</label>
+    </div>
+    <div class="no-show">
+      <input type="checkbox" id="simd"><label for="simd">simd</label>
+      <input type="checkbox" id="threads"><label for="threads">threads</label>
+      <input type="checkbox" id="multi_value"><label for="multi_value">multi value</label>
+      <input type="checkbox" id="tail_call"><label for="tail_call">tail call</label>
+      <input type="checkbox" id="bulk_memory"><label for="bulk_memory">bulk memory</label>
+      <input type="checkbox" id="reference_types"><label for="reference_types">reference types</label>
+    </div>
+    <!-- Library !-->
+    <script>var WabtModule;</script>
+    <script src="./libwabt.js"></script>
+<script src="./main.js"></script>
+
+  <script>
+      // testcases:
+      // inside modal
+      let testClose = document.getElementById("new-modal-close");
+      let testAdd = document.getElementById("new-modal-add");
+      let testSub = document.getElementById("new-modal-sub");
+      let newModal = document.getElementById("param-container");
+      let loops = document.getElementById("loops");
+      let loopWarning = document.getElementById("loop-warning");
+      let numOfParams = 1;
+      
+      testAdd.onclick = function () {
+          numOfParams += 1;
+            let input = document.createElement('input');
+            let label = document.createElement('label');
+           let lb = document.createElement('br');
+          label.classList.add("dark-label");
+          label.innerText = "Parameter "+numOfParams+": ";
+          input.setAttribute("id", "param-"+numOfParams);
+          input.setAttribute("type", "text");
+          label.setAttribute("id", "param-label-"+numOfParams);
+          lb.setAttribute("id", "param-br-"+numOfParams);
+            newModal.insertBefore(label, testAdd);
+            newModal.insertBefore(input, testAdd);
+          newModal.insertBefore(lb, testAdd);
+      };
+      testSub.onclick = function () {
+          if(numOfParams > 0) {
+              newModal.removeChild(document.getElementById("param-"+numOfParams));
+              newModal.removeChild(document.getElementById("param-label-"+numOfParams));
+              newModal.removeChild(document.getElementById("param-br-"+numOfParams));
+              numOfParams -= 1;
+          } else {
+              alert("Error: Less than zero testcases are not allowed.");
+          }
+      }
+      
+      loops.onblur = function () {
+          if(loops.value > 9999) {
+              loopWarning.style.display = "inline-block";
+          } else {
+              loopWarning.style.display = "none";
+          }
+      }
+      
+      // outside of modal
+      let runOutput = document.getElementById("run-output");
+      let modal = document.getElementById("new-modal-wrapper");
+      let saveModal = document.getElementById("new-modal-close");
+      saveModal.onclick = function() {
+          closeTestcaseWindow();
+      }
+      runOutput.onclick = function () {
+          newTestcaseWindow();
+      };
+      window.onclick = function(event) {
+        if (event.target == modal) {
+            closeTestcaseWindow();
+        }
+      }
+      function newTestcaseWindow() {
+          modal.style.display = "block";
+      }
+      function closeTestcaseWindow() {
+          let entered = true;
+          for(var b = 1; b <=(document.getElementById("param-container").childElementCount-2)/3;b++) {
+              let val = document.getElementById("param-"+b).value;
+              if(val=="") {
+                  entered = false;
+              }
+          }
+          if(entered==true) {
+              modal.style.display = "none";
+          } else {
+              alert("There must be a value entered for all parameters.")
+          }
+          
+          
+      }
+    // WAT2WASM AND RUNNING
+    let wasmCheck = document.getElementById("wasm-log-check");
+      wasmCheck.oninput = function () {
+          if(wasmCheck.checked) {
+              document.getElementById("wasm-log").style.display = "inline";
+          } else {
+              document.getElementById("wasm-log").style.display = "none";
+          }
+      }
+      
+      let watCheck = document.getElementById("wat-check");
+      watCheck.oninput = function () {
+          if(watCheck.checked) {
+              document.getElementById("wat-out").style.display = "inline";
+          } else {
+              document.getElementById("wat-out").style.display = "none";
+          }
+      }
+
+    // COMPILER CONSOLE
+
+    var today = new Date(); // shows date of compilation
+    var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+
+    document.getElementById("run").onclick = ()=>{
+        document.getElementById("run-output").style.display = "inline-block";
+      document.getElementById("output").style.display = "inline-block";
+        
+      document.getElementById("clear-console").style.display = "inline-block";
+      console.log("Compiling...");
+      compile();
+      today = new Date(); // shows date of compilation
+      time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+      console.log("Compile finished at "+time);
+    };
+
+    document.getElementById("clear-console").onclick = ()=>{
+      document.getElementById("clear-console").style.display = "none";
+      document.getElementById("output").innerHTML = "";
+        document.getElementById("run-output").innerHTML = "";
+    };
+    document.getElementById("save").onclick = ()=>{
+      document.getElementById("clear-console").style.display = "inline-block";
+        document.getElementById("run-output").style.display = "inline-block";
+      document.getElementById("output").style.display = "inline-block";
+      
+      localStorage.setItem("code", document.getElementById("editor").innerText);
+      today = new Date(); // shows date of save
+      time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+      console.log("Saved at " + time +".");
+    };
+    document.getElementById("load").onclick = ()=>{
+      document.getElementById("clear-console").style.display = "inline-block";
+        document.getElementById("run-output").style.display = "inline-block";
+      document.getElementById("output").style.display = "inline-block";
+        
+      if(localStorage.getItem("code")) {
+        document.getElementById("editor").innerHTML = localStorage.getItem("code");
+        today = new Date(); // shows date of load
+        time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        console.log("Loaded at " + time +".");
+        update(); // Highlights automatically
+      } else {
+        console.log("You do not have a save to load from!");
+      }
+     
+    };
+
+    
+
+
+
+    // FONT SIZE SLIDER
+      var sizeRanger = document.getElementById("sizer");
+      var fontSize = 1;
+      sizeRanger.oninput = function () {
+          fontSize = 4-sizeRanger.value;
+          document.getElementById("editor").style.fontSize = fontSize+"em";
+          document.getElementById("compiled").style.fontSize = fontSize+"em";
+          document.getElementById("wasmcompiled").style.fontSize = fontSize/2+"em";
+          document.getElementById("size-slider").style.height = fontSize*39.5+"px";
+          document.getElementById("size-slider-button").style.top = fontSize*39.5+"px";
+      };
+      
+
+    // SYNTAX HIGHLIGHTING
+
+document.getElementById("check").onclick = function () {
+  update();
+}
+
+/*
+*  This code's purpose is to update at the right time. It is taken from https://schier.co/blog/wait-for-user-to-stop-typing-using-javascript.
+*/
+
+let timeout = null;
+
+document.getElementById('editor').addEventListener('keyup', function (e) {
+    clearTimeout(timeout);
+    timeout = setTimeout(function () {
+        update();
+        document.getElementById("editor").blur();
+    }, 8000);
+});
+
+// end
+
+var variables = [];
+
+var contents = document.getElementById("editor").innerHTML;
+var words = contents.split(" ");
+window.onload = function () {
+update();
+}
+
+
+
+function update() {
+contents = document.getElementById("editor").innerText;
+contents = contents.split(" ").join(" space ");
+contents = contents.split("\n").join(" newline ");
+
+words = contents.split(" ");
+
+
+for(var i = 0; i <= words.length-1; i++) {
+  // control flow
+  if(words[i] == "if"||words[i] == "else"||words[i] == "while"||words[i] == "for") {
+    updateAll(i, "#05f0d8");
+  }
+  if(words[i] == "to") {
+    updateAll(i, "#05f0d8");
+  }
+  if(words[i] == "elif") {
+    //updateAll(i, "red"); // NOT IMPLEMENTED
+  }
+  if(words[i] == ">"||words[i] == "&gt;"|| words[i] == "<"||words[i] == "&lt;"|| words[i] == ">="||words[i] == "&gt;="||words[i] == "<="||words[i] == "&lt;="||words[i] == "=="||words[i] == "!="||words[i] == "&amp;&amp;"||words[i] == "!"||words[i] == "||"||words[i] == "!|") {
+    updateAll(i, "orange");
+  }
+
+  if(words[i] == "{"||words[i] == "}") {
+    updateAll(i, "#02c9e8");
+  }
+  if(words[i] == "("||words[i] == ")") {
+    updateAll(i, "blue");
+  }
+  // variables
+  if(words[i] == "number") { 
+    updateAll(i, "orange");
+  }
+  if(words[i] == "decimal") { 
+    updateAll(i, "orange");
+  }
+  if(variables.includes(words[i])) { // actual variable
+    updateAll(i, "yellow");
+  }
+   // keywords
+  if(words[i] == "add"||words[i] == "sub"|words[i] == "mul"|words[i] == "div"|words[i] == "mod") {
+    updateAll(i, "red");
+  }
+
+  // various
+  if(words[i] == "//" || words[i] == "/;") { 
+    updateAll(i, "green");
+  }
+  if(words[i] == "input") {
+    updateAll(i, "red");
+  }
+  if(words[i] == "output") {
+    updateAll(i, "red");
+  }
+// type conversion
+  if(words[i] == "toNumber") {
+    updateAll(i, "orange");
+  }
+  if(words[i] == "toDecimal") {
+    updateAll(i, "orange");
+  }
+  if(words[i] == "round") {
+    updateAll(i, "red");
+  }
+    
+  if(words[i] == "options_output-warning"||words[i] == "options_lone-math-output"||words[i] == "options_lone-math-output_output-warning"||words[i] == "options_output-warning_lone-math-output") { // compiler options /* This is spaghetti code but doing it the way you think would work causes it to crash. */
+    updateAll(i, "orange");
+  }
+  
+}
+
+function updateAll(pos, color) {
+    words.splice(pos,0, "<span style='color: " + color + "'>");
+    words.splice(pos+2,0, "</span>");
+    for(var i = 0; i <= words.length-1; i++) {
+      if(words[i] == "newline") {
+        words[i] = "\n";
+      }
+      if(words[i] == "space") {
+        words[i] = " ";
+      }
+    }
+    words = words.join("");
+    document.getElementById("editor").innerHTML = words;
+    contents = document.getElementById("editor").innerHTML;
+    contents = contents.split(" ").join(" space ");
+    contents = contents.split("\n").join(" newline ");
+
+    words = contents.split(" ");
+    
+  }
+}
+  </script>
+</body>
+</html>
