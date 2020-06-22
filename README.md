@@ -1,2 +1,2 @@
 # UltimateProGrammer Github Pages
-Github Pages for UltimateProGrammer. Currently hosting b^2 docs.
+Github Pages for UltimateProGrammer. Currently hosting two esoteric language editors.
