@@ -294,36 +294,26 @@ viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
     document.getElementById("load-button").onclick = ()=>{
         editor.value = localStorage.getItem("spaghetti-save");
     }
-    var ctrlDown = false;
     editor.addEventListener("keydown", event => {
-        if (event.keyCode === 91||event.keyCode === 17) { // meta or control
-            ctrlDown = true;
-        }
-        
-        if (ctrlDown==true&&event.keyCode === 187) { // meta or control
+        let ctrlDown = (event.ctrlKey || event.metaKey);
+        if (ctrlDown && event.keyCode === 187) {
             event.preventDefault();
             addToEditor("≡");
         }
         
-        if (ctrlDown==true&&event.keyCode === 188) { // meta or control
+        if (ctrlDown && event.keyCode === 188) {
             event.preventDefault();
             addToEditor("⇠");
         }
         
-        if (ctrlDown==true&&event.keyCode === 190) { // meta or control
+        if (ctrlDown && event.keyCode === 190) {
             event.preventDefault();
             addToEditor("⇢");
         }
-        if (ctrlDown==true&&event.keyCode === 83) { // meta or control
+        if (ctrlDown && event.keyCode === 83) {
             event.preventDefault();
             editor.value = localStorage.getItem("spaghetti-save");
         }
-    });
-    editor.addEventListener("keyup", event => {
-        if (event.keyCode === 229||event.keyCode === 17) {
-            ctrlDown = false;
-        }
-        // do something
     });
     
     function addToEditor(toAdd) {
