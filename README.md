@@ -1,10 +1,7 @@
-# UltimateProGrammer Github Pages
-Github Pages for UltimateProGrammer. Currently hosting two esoteric language editors.
+# NateLevin1 Github Pages
 
-B<sup>2</sup> Editor: [https://ultimatepro-grammer.github.io/bSquaredEditor/](https://ultimatepro-grammer.github.io/bSquaredEditor/)
+### [Visit my website: https://natelev.in/](https://natelev.in)
 
-SpaghettiScript Interpreter: [https://ultimatepro-grammer.github.io/spaghettiscript/](https://ultimatepro-grammer.github.io/spaghettiscript/)
+B<sup>2</sup> Editor: https://natelevin1.github.io/bSquaredEditor/
 
-JSQL Editor: [https://ultimatepro-grammer.github.io/JSQL/editor/index.html](https://ultimatepro-grammer.github.io/JSQL/editor/index.html)
-
-JSQL Docs: [https://ultimatepro-grammer.github.io/JSQL/](https://ultimatepro-grammer.github.io/JSQL/)
+SpaghettiScript Interpreter: https://natelevin1.github.io/spaghettiscript/
